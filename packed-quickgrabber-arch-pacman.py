@@ -3,7 +3,7 @@ import shutil
 import platform
 # Under The Creative Commons ShareAlike 4.0 International License.
 #Feel Free To ReDistrubute, Modify, And Share This Code. Just Give Credit To Me! @tuxlarper
-#Orginal Github Repo: github.com/Tuxlarper/Packed-QuickGrabber
+#Orginal Github Repo: github.com/Tuxlarper/Packed-Quickgrabber
 print("QuickGrabber Arch Pacman-Based Installer")
 print("Developed By Tuxlarper And Fully Open Source. Made With Love")
 print("This installer is for Arch Linux and Arch-based distributions only.")
@@ -50,7 +50,7 @@ can_continue = ask_yes_no("Do you know what this script will do? (yes/no): ")
 
 if can_continue in ("no", "n"):
     print("Please read about the script before continuing:")
-    print("https://github.com/Tuxlarper/Packed-QuickGrabber")
+    print("https://github.com/Tuxlarper/Packed-Quickgrabber")
     print("Installation cancelled.")
 else:
     print("This script will install the following applications:")
