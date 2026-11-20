@@ -6,11 +6,11 @@ import shlex
 import re
 # Under The Creative Commons ShareAlike 4.0 International License.
 #Feel Free To ReDistrubute, Modify, And Share This Code. Just Give Credit To Me! @tuxlarper
-#Orginal Github Repo: github.com/Tuxlarper/Packed-QuickGrabber
+#Orginal Github Repo: github.com/Tuxlarper/Packed-Quickgrabber
 print("QuickGrabber Debian APT Installer")
 print("Developed By Tuxlarper And Fully Open Source. Made With Love")
 print("This installer is for Debian and Debian-based distributions only.")
-print("Builds At github.com/Tuxlarper/Packed-QuickGrabber")
+print("Builds At github.com/Tuxlarper/Packed-Quickgrabber")
 print("Under Creative Commons ShareAlike 4.0 International License.")
 
 def ask_yes_no(prompt):
