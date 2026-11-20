@@ -3,6 +3,7 @@ import shutil
 import platform
 import os
 import shlex
+import re
 # Under The Creative Commons ShareAlike 4.0 International License.
 #Feel Free To ReDistrubute, Modify, And Share This Code. Just Give Credit To Me! @tuxlarper
 #Orginal Github Repo: github.com/Tuxlarper/Packed-QuickGrabber
@@ -20,10 +21,16 @@ def ask_yes_no(prompt):
     return answer
 
 
-def run_with_sudo(command):
+def run_with_sudo(command, *, input_text=None, suppress_output=False):
     """Run a command with the current user's approved privilege level."""
     prefix = [] if hasattr(os, "geteuid") and os.geteuid() == 0 else ["sudo"]
-    result = subprocess.run([*prefix, *command], check=False)
+    result = subprocess.run(
+        [*prefix, *command],
+        check=False,
+        input=input_text,
+        text=input_text is not None,
+        stdout=subprocess.DEVNULL if suppress_output else None,
+    )
     if result.returncode != 0:
         print(f"Command failed with exit code {result.returncode}: {' '.join(command)}")
     return result
@@ -59,6 +66,67 @@ def offer_package(prompt, package):
         run_with_sudo(["apt-get", "install", "-y", package])
     else:
         print("Skipped.")
+
+
+def offer_mullvad():
+    answer = ask_yes_no(
+        "Would You Like Mullvad VPN? (official Mullvad apt repo required)(yes/no): "
+    )
+    if answer not in ("yes", "y"):
+        print("Skipped.")
+        return
+
+    if shutil.which("curl") is None or shutil.which("dpkg") is None:
+        print("curl and dpkg are required to configure the Mullvad repository. Skipping.")
+        return
+
+    architecture_result = subprocess.run(
+        ["dpkg", "--print-architecture"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    architecture = architecture_result.stdout.strip()
+    if (
+        architecture_result.returncode != 0
+        or re.fullmatch(r"[a-z0-9-]+", architecture) is None
+    ):
+        print("Could not determine the system architecture. Skipping Mullvad VPN.")
+        return
+
+    keyring_path = "/usr/share/keyrings/mullvad-keyring.asc"
+    key_result = run_with_sudo(
+        [
+            "curl",
+            "-fsSLo",
+            keyring_path,
+            "https://repository.mullvad.net/deb/mullvad-keyring.asc",
+        ]
+    )
+    if key_result.returncode != 0:
+        print("Could not download the Mullvad signing key. Skipping Mullvad VPN.")
+        return
+
+    source = (
+        "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc "
+        f"arch={architecture}] https://repository.mullvad.net/deb/stable stable main\n"
+    )
+    source_result = run_with_sudo(
+        ["tee", "/etc/apt/sources.list.d/mullvad.list"],
+        input_text=source,
+        suppress_output=True,
+    )
+    if source_result.returncode != 0:
+        print("Could not configure the Mullvad apt repository. Skipping Mullvad VPN.")
+        return
+
+    update_result = run_with_sudo(["apt-get", "update"])
+    if update_result.returncode != 0:
+        print("Mullvad repository update failed. Skipping Mullvad VPN.")
+        return
+
+    print("Continuing...")
+    run_with_sudo(["apt-get", "install", "-y", "mullvad-vpn"])
 
 
 def offer_flatpak(prompt, app_id):
@@ -260,10 +328,7 @@ else:
                             "Would You Like Discord? (Flatpak Required)(yes/no): ",
                             "com.discordapp.Discord",
                         )
-                        offer_package(
-                            "Would You Like Mullvad VPN? (Mullvad apt repo required)(yes/no): ",
-                            "mullvad-vpn",
-                        )
+                        offer_mullvad()
                         offer_package(
                             "Would You Like Steam? (contrib/non-free or multiverse repo required)(yes/no): ",
                             "steam",
@@ -287,4 +352,6 @@ else:
                         offer_package("Would You Like Kdenlive? (extra)(yes/no): ", "kdenlive")
                         offer_package("Would You Like Krita? (extra)(yes/no): ", "krita")
                         offer_package("Would You Like Audacity? (extra)(yes/no): ", "audacity")
+#oh also lol
+
 
