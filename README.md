@@ -12,7 +12,7 @@ for example:
 
 ```bash
  git clone https://github.com/tuxlarper/Packed-Quickgrabber
- cd Packed-Quickgrabber
+ cd Packed-Quickgrabber 
  python3 packed-Quickgrabber-arch-pacman.py
 ```
     
