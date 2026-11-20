@@ -11,6 +11,7 @@ You Can This Script By Simply Downloading The .py file for Your Distro Or Clone 
 for example:
 
 ```bash
+ git clone https://github.com/tuxlarper/Packed-Quickgrabber
  cd Packed-Quickgrabber
  python3 packed-Quickgrabber-arch-pacman.py
 ```
