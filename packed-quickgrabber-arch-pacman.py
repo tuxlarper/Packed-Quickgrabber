@@ -1,9 +1,10 @@
 import subprocess
 import shutil
 import platform
+import os
 # Under The Creative Commons ShareAlike 4.0 International License.
 #Feel Free To ReDistrubute, Modify, And Share This Code. Just Give Credit To Me! @tuxlarper
-#Orginal Github Repo: github.com/Tuxlarper/Packed-Quickgrabber
+#Orginal Github Repo: github.com/Tuxlarper/Packed-QuickGrabber
 print("QuickGrabber Arch Pacman-Based Installer")
 print("Developed By Tuxlarper And Fully Open Source. Made With Love")
 print("This installer is for Arch Linux and Arch-based distributions only.")
@@ -50,7 +51,7 @@ can_continue = ask_yes_no("Do you know what this script will do? (yes/no): ")
 
 if can_continue in ("no", "n"):
     print("Please read about the script before continuing:")
-    print("https://github.com/Tuxlarper/Packed-Quickgrabber")
+    print("https://github.com/Tuxlarper/Packed-QuickGrabber")
     print("Installation cancelled.")
 else:
     print("This script will install the following applications:")
@@ -165,32 +166,38 @@ else:
                     offer_package("Would You Like Kdenlive? (extra)(yes/no): ", "kdenlive")
                     offer_package("Would You Like Krita? (extra)(yes/no): ", "krita")
                     offer_package("Would You Like Audacity? (extra)(yes/no): ", "audacity")
-                
-                    
-                    answer = ask_yes_no("Would You Like Spicetify? (official script)(yes/no): ")
-                    if answer in ("yes", "y"):
-                        print("Continuing...")
-                        installer = subprocess.run(
-                            [
-                                "curl",
-                                "-fsSL",
-                                "https://raw.githubusercontent.com/spicetify/cli/main/install.sh",
-                            ],
-                            stdout=subprocess.PIPE,
+
+            answer = ask_yes_no("Would You Like Spicetify? (official script, no sudo)(yes/no): ")
+            if answer in ("yes", "y"):
+                if hasattr(os, "geteuid") and os.geteuid() == 0:
+                    print("Spicetify must be installed as your normal user, not as root.")
+                else:
+                    print("Continuing...")
+                    installer = subprocess.run(
+                        [
+                            "curl",
+                            "-fsSL",
+                            "https://raw.githubusercontent.com/spicetify/cli/main/install.sh",
+                        ],
+                        stdout=subprocess.PIPE,
+                        check=False,
+                    )
+                    print("Downloading...")
+                    if installer.returncode != 0:
+                        print("Failed to download the Spicetify installer.")
+                    else:
+                        result = subprocess.run(
+                            ["sh"],
+                            input=installer.stdout,
                             check=False,
                         )
-                        print("downloading...")
-                        if installer.returncode != 0:
-                            print("Failed to download the Spicetify installer.")
-                        else:
-                            result = subprocess.run(["sh"], input=installer.stdout, check=False)
-                            if result.returncode != 0:
-                                print(
-                                    "Spicetify installer failed with exit code "
-                                    f"{result.returncode}."
-                                )
-                    else:
-                        print("Skipped.")
+                        if result.returncode != 0:
+                            print(
+                                "Spicetify installer failed with exit code "
+                                f"{result.returncode}."
+                            )
+            else:
+                print("Skipped.")
 
 #d293LCBmaXJzdCBwZXJzb24gaSBhaHZlIHNlZ
 # W4gdG8gYWN0dWFsbHkgcmVhZCB0aGUgY29kZS4gYW
