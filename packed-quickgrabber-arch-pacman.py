@@ -1,3 +1,4 @@
+import hashlib
 import subprocess
 import shutil
 import platform
@@ -5,6 +6,13 @@ import os
 # Under The Creative Commons ShareAlike 4.0 International License.
 #Feel Free To ReDistrubute, Modify, And Share This Code. Just Give Credit To Me! @tuxlarper
 #Orginal Github Repo: github.com/Tuxlarper/Packed-QuickGrabber
+SPICETIFY_INSTALLER_URL = (
+    "https://raw.githubusercontent.com/spicetify/cli/"
+    "d095d83daa2cc1efd4f5d9cf7dc2687dcc204d6d/install.sh"
+)
+SPICETIFY_INSTALLER_SHA256 = (
+    "e7501c35ad65df0f7579377ce062b3d593cdc0d83a30dc62933f10f89f6b98bc"
+)
 print("QuickGrabber Arch Pacman-Based Installer")
 print("Developed By Tuxlarper And Fully Open Source. Made With Love")
 print("This installer is for Arch Linux and Arch-based distributions only.")
@@ -177,7 +185,7 @@ else:
                         [
                             "curl",
                             "-fsSL",
-                            "https://raw.githubusercontent.com/spicetify/cli/main/install.sh",
+                            SPICETIFY_INSTALLER_URL,
                         ],
                         stdout=subprocess.PIPE,
                         check=False,
@@ -185,6 +193,13 @@ else:
                     print("Downloading...")
                     if installer.returncode != 0:
                         print("Failed to download the Spicetify installer.")
+                    elif hashlib.sha256(installer.stdout).hexdigest() != (
+                        SPICETIFY_INSTALLER_SHA256
+                    ):
+                        print(
+                            "Spicetify installer integrity check failed; "
+                            "refusing to run it."
+                        )
                     else:
                         result = subprocess.run(
                             ["sh"],
